@@ -1,0 +1,317 @@
+import React, { useEffect, useState } from 'react'
+import { signupStyles } from '../assets/dummyStyles'
+import { FaArrowLeft, FaCheck, FaEnvelope, FaEye, FaEyeSlash, FaLock, FaUser } from 'react-icons/fa'
+import { useNavigate } from 'react-router-dom'
+import logo from "../assets/logocar.png";
+import { toast, ToastContainer } from 'react-toastify';
+import axios from 'axios';
+
+const SignUp = () => {
+
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        password: "",
+    });
+    
+    const [showPassword, setShowPassword] = useState(false);
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
+    const [isActive, setIsActive] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        setIsActive(true);
+    }, []);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!acceptedTerms) {
+            toast.error('Please accept terms & conditions', { theme: 'dark' });
+        }
+        setLoading(true);
+
+        try {
+            const base = 'http://localhost:5000';
+            const url = `${base}/api/auth/register`
+
+            const res = await axios.post(url, formData, {
+                headers: {'Content-Type' : 'application/json'}
+            });
+
+            if(res.status >= 200 && res.status < 300) {
+                const {token, user} = res.data || {};
+
+                if(token) localStorage.setItem('token', token);
+                if(user) localStorage.setItem('user', JSON.stringify(user));
+                toast.success('Account created successfully! Welcome to PremiumDrive', {
+                position: "top-right",
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: 'dark',
+                autoClose: 1200,
+                onClose: () => navigate('/login')
+            });
+
+            setLoading(false);
+            return;
+            }
+            toast.error('Unexpected server response during registration.', {
+                theme: 'dark'
+            })
+            
+        } 
+        catch (err) {
+      // Detailed axios error handling
+      console.error("Signup error (frontend):", err);
+
+      if (err.response) {
+        // Server responded with a status outside 2xx
+        console.log(
+          "Server response (debug):",
+          err.response.status,
+          err.response.data
+        );
+        const serverMessage =
+          err.response.data?.message ||
+          err.response.data?.error ||
+          `Server error: ${err.response.status}`;
+        toast.error(serverMessage, { theme: "dark" });
+      } else if (err.request) {
+        // Request made but no response
+        console.log("No response received (debug):", err.request);
+        toast.error(
+          "No response from server — ensure backend is running and CORS is configured.",
+          {
+            theme: "dark",
+          }
+        );
+            } else {
+                // Something else happened
+                toast.error(err.message || "Registration failed", { theme: "dark" });
+            }
+
+        } finally {
+                setLoading(false);
+            }
+
+        };
+
+        const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
+    return (
+        <div className={signupStyles.pageContainer}>
+
+            {/* ANIMATED BACKGROUND */}
+            <div className={signupStyles.animatedBackground.base}>
+                <div className={`${signupStyles.animatedBackground.orb1} ${isActive ? 'translate-x-20 translate-y-10' : ''}`} />
+                <div className={`${signupStyles.animatedBackground.orb2} ${isActive ? '-translate-x-20 -translate-y-10' : ''}`} />
+                <div className={`${signupStyles.animatedBackground.orb3} ${isActive ? '-translate-x-10 translate-y-20' : ''}`} />
+            </div>
+
+            {/* BACK BUTTON */}
+            <a href="/" className={signupStyles.backButton}>
+                <FaArrowLeft className="text-xs sm:text-sm group-hover:-translate-x-1 transition-transform" />
+                <span className="font-medium text-xs sm:text-sm">Back to Home</span>
+            </a>
+
+            {/* SIGNUP CARD */}
+            <div
+                className={`${signupStyles.signupCard.container} ${
+                    isActive ? "scale-100 opacity-100" : "scale-90 opacity-0"
+                }`}
+            >
+                <div
+                    className={signupStyles.signupCard.card}
+                    style={{
+                        boxShadow: "0 15px 35px rgba(0,0,0,0.2)",
+                        borderRadius: "24px",
+                    }}
+                >
+                    {/* Decorations */}
+                    <div className={signupStyles.signupCard.decor1} />
+                    <div className={signupStyles.signupCard.decor2} />
+
+                    {/* Header */}
+                    <div className={signupStyles.signupCard.headerContainer}>
+                        <div className={signupStyles.signupCard.logoContainer}>
+                            <div className={signupStyles.signupCard.logoText}>
+                                <img
+                                    src={logo}
+                                    className="h-[1.2em] w-auto block object-contain"
+                                    style={{ display: "block" }}
+                                />
+                                <span className="font-bold tracking-wider text-white mt-1">
+                                    KARZONE
+                                </span>
+                            </div>
+                        </div>
+                        <h1 className={signupStyles.signupCard.title}>Join PremiumDrive</h1>
+                        <p className={signupStyles.signupCard.subtitle}>
+                            Create your exclusive account
+                        </p>
+                    </div>
+
+                    {/* FORM */}
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-4 relative z-10">
+
+                        {/* NAME */}
+                        <div className="relative">
+                            <div className="flex items-center gap-3 bg-white/10 px-4 py-3 rounded-xl border border-gray-700">
+                                <FaUser className="text-gray-300" />
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    placeholder="Full Name"
+                                    required
+                                    autoComplete="name"
+                                    className="bg-transparent w-full outline-none text-white"
+                                />
+                            </div>
+                        </div>
+
+                        {/* EMAIL */}
+                        <div className="relative">
+                            <div className="flex items-center gap-3 bg-white/10 px-4 py-3 rounded-xl border border-gray-700">
+                                <FaEnvelope className="text-gray-300" />
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    placeholder="Email Address"
+                                    required
+                                    autoComplete="email"
+                                    className="bg-transparent w-full outline-none text-white"
+                                />
+                            </div>
+                        </div>
+
+                        {/* PASSWORD */}
+                        <div className="relative">
+                            <div className="flex items-center gap-3 bg-white/10 px-4 py-3 rounded-xl border border-gray-700">
+                                <FaLock className="text-gray-300" />
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    placeholder="Create Password"
+                                    required
+                                    autoComplete="new-password"
+                                    className="bg-transparent w-full outline-none text-white"
+                                />
+
+                                <div
+                                    onClick={togglePasswordVisibility}
+                                    className="cursor-pointer text-gray-300"
+                                >
+                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                </div>
+                            </div>
+                        </div>
+                        {/* TNC */}
+                        <div className=" flex items-start mt-2 sm:mt-3 md:mt-4">
+                            <div className="flex items-center h-5 mt-0.5 sm:mt-1">
+                                <input 
+                                type="checkbox" 
+                                id="terms" 
+                                name="terms" 
+                                checked={acceptedTerms} 
+                                onChange={() => setAcceptedTerms(!acceptedTerms)}
+                                className={signupStyles.form.checkbox}
+                                style={{ boxShadow: "none"}}
+                                />
+                            </div>
+
+                            <div className=" ml-2 sm:ml-3 sm:text-sm">
+                                <label htmlFor="terms" className={signupStyles.form.checkboxLabel}>
+                                    i agree to the <span className={signupStyles.form.checkboxLink}>
+                                        Terms & Conditions
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button 
+                        style={{
+                            borderRadius: "16px",
+                            boxShadow: "0 5px 15px rgba(8,90,20,0.6)",
+                        }}
+                        type="submit" 
+                        disabled={loading}
+                        className={signupStyles.form.submitButton}>
+                            <span className={signupStyles.form.buttonText}>
+                                <FaCheck className="text-white text-sm sm:text-base md:text-lg" />
+                                {loading ? "CREATING..." : "CREATE ACCOUNT"}
+                            </span>
+                            <div className={signupStyles.form.buttonHover}/>
+                        </button>
+                    </form>
+
+                    <div 
+                    style={{
+                        borderColor: "rgba(255,255,255,0.06)",
+                    }}
+                    className={signupStyles.signinSection}
+                    >
+                        <p className={signupStyles.signinText}>Already have an account?</p>
+                        <a href="/lgin" className={signupStyles.signinButton}
+                        style={{
+                            borderRadius: "16px",
+                            boxShadow: "0 2px 10px rgba(245, 124, 0, 0.08)",
+                        }}
+                        >
+                            LOGIN TO YOUR ACCOUNT
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <ToastContainer
+    position="top-right"
+    autoClose={1000}
+    hideProgressBar={false}
+    newestOnTop={false}
+    closeOnClick
+    rtl={false}
+    pauseOnFocusLoss
+    draggable
+    pauseOnHover
+    theme="dark"
+    toastStyle={{
+      backgroundColor: "#fb923c",
+      color: "#ffffff",
+      borderRadius: "16px",
+      boxShadow: "0 4px 20px rgba(245,124,0,0.18)",
+      fontFamily: "'Montserrat', sans-serif",
+    }}
+  />
+
+  {/* Font Import */}
+  <style>
+    {`
+          @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+          body { font-family: 'Montserrat', sans-serif; }
+        `}
+  </style>
+        </div>
+    );
+};
+
+export default SignUp;
