@@ -41,7 +41,7 @@ const Contact = () => {
             `Car Type: ${formData.carType}%0A` +
             `Message: ${formData.message}`;
 
-        window.open(`https://wa.me/+918299431275?text=${whatsappMessage}`, '_blank');
+        window.open(`https://wa.me/+7034723717?text=${whatsappMessage}`, '_blank');
 
         setFormData({ name: '', email: '', phone: '', carType: '', message: '' });
     };
@@ -114,7 +114,7 @@ const Contact = () => {
                                     {
                                         icon: FaEnvelope,
                                         label: 'Email',
-                                        value: 'siyajifriya23@gmail.com',
+                                        value: 'info@karzondetails.com',
                                         color: 'bg-orange-900/30'
                                     },
                                     {

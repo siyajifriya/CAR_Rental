@@ -79,17 +79,17 @@ const Footer = () => {
             <ul className={styles.contactList}>
               <li className={styles.contactItem}>
                 <FaMapMarkedAlt className={styles.contactIcon} />
-                <span>123 Drive Avenue, Auto City, CA 90201</span>
+                <span>123 street, avanuew, calicut</span>
               </li>
 
               <li className={styles.contactItem}>
                 <FaPhone className={styles.contactIcon} />
-                <span>+91 6789567845</span>
+                <span>+91 1234567890</span>
               </li>
 
               <li className={styles.contactItem}>
                 <FaEnvelope className={styles.contactIcon} />
-                <span>info@karzonservice.com</span>
+                <span>info@karzondetails.com</span>
               </li>
             </ul>
 
