@@ -85,77 +85,83 @@ const AddCar = () => {
   }, []);
 
   //HANDLE SUBMIT
-   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const carNameForToast = data.carName || "";
+   //HANDLE SUBMIT
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const carNameForToast = data.carName || "";
 
-    try {
-      const formData = new FormData();
-      const fieldMappings = {
-        make: data.carName,
-        dailyRate: data.dailyPrice,
-        seats: data.seats,
-        fuelType: data.fuelType,
-        mileage: data.mileage,
-        transmission: data.transmission,
-        year: data.year,
-        model: data.model,
-        description: data.description || "",
-        color: "",
-        category: data.category,
-      };
+  try {
+    const formData = new FormData();
+    const fieldMappings = {
+      make: data.carName,
+      dailyRate: data.dailyPrice,
+      seats: data.seats,
+      fuelType: data.fuelType,
+      mileage: data.mileage,
+      transmission: data.transmission,
+      year: data.year,
+      model: data.model,
+      description: data.description || "",
+      color: "",
+      category: data.category,
+    };
 
-      Object.entries(fieldMappings).forEach(([key, value]) => {
-        formData.append(key, value);
-      });
+    Object.entries(fieldMappings).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
 
-      if (data.image) formData.append("image", data.image);
+    if (data.image) formData.append("image", data.image);
 
-      await api.post("/api/cars", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+    await api.post("/api/cars", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
 
-      showToast(
-        "success",
-        "Congratulations!",
-        `Your ${carNameForToast} has been listed successfully`,
-        <svg
-          className={AddCarPageStyles.iconLarge}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M5 13l4 4L19 7"
-          ></path>
-        </svg>
-      );
+    showToast(
+      "success",
+      "Congratulations!",
+      `Your ${carNameForToast} has been listed successfully`,
+      <svg
+        className={AddCarPageStyles.iconLarge}
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M5 13l4 4L19 7"
+        ></path>
+      </svg>
+    );
 
-    } catch (error) {
-      console.error(error);
-      showToast(
-        "error",
-        "Error",
-        "Failed to add the car. Please try again!",
-        <svg
-          className={AddCarPageStyles.iconLarge}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M6 18L18 6M6 6l12 12"
-          ></path>
-        </svg>
-      );
-    }
-  }; 
+    // ⬅ added (auto refresh after 1.5 sec)
+    setTimeout(() => {
+      window.location.reload();
+    }, 1500);
+
+  } catch (error) {
+    console.error(error);
+    showToast(
+      "error",
+      "Error",
+      "Failed to add the car. Please try again!",
+      <svg
+        className={AddCarPageStyles.iconLarge}
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M6 18L18 6M6 6l12 12"
+        ></path>
+      </svg>
+    );
+  }
+};
 
   const renderInputField = (field) => (
     <div key={field.name}>
